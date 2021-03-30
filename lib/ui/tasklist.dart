@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_search_bar/flutter_search_bar.dart';
 import 'package:flutter_tasks/model/task-models.dart';
 import 'package:flutter_tasks/service/dataservice.dart';
 import 'package:flutter_tasks/ui/taskcreate.dart';
 import 'package:flutter_tasks/ui/taskdetail.dart';
+import 'package:flutter_tasks/ui/taskview.dart';
 
 class TaskListPage extends StatefulWidget {
   TaskListPage({Key key, this.title}) : super(key: key);
@@ -16,6 +18,77 @@ class TaskListPage extends StatefulWidget {
 class _TaskListPageState extends State<TaskListPage> {
   DataService dataService = DataService();
   Future<TasksResponse> tasks;
+
+  String searchText = '';
+  SearchBar searchBar;
+  SortType _sortType = SortType.default_sort;
+
+  AppBar _buildAppBar(BuildContext context) {
+    return new AppBar(
+        title: Text(widget.title),
+        actions: [
+          searchBar.getSearchAction(context),
+          PopupMenuButton<SortType>(
+            onSelected: (SortType result) { _sortType = result; refreshTasks();},
+            itemBuilder: (BuildContext context) => SortType.values.toList().map((st)=>
+                PopupMenuItem<SortType>(
+                  value: st,
+                  child: Text(st.name),
+                )
+            ).toList(),
+          ),
+          IconButton(
+            icon: Icon(Icons.refresh),
+            tooltip: 'Refresh',
+            onPressed: () {
+              refreshTasks();
+            },
+          ),
+        ]
+    );
+  }
+
+  List<Task> _sort(SortType sortType, List<Task> givenList){
+    print('sort '+sortType.toString());
+    if(sortType!=SortType.default_sort){
+      givenList = _sort(SortType.default_sort,givenList);
+    }
+    givenList.sort((a,b){
+      switch(sortType){
+        case SortType.default_sort : return a.id.compareTo(b.id); break;
+        case SortType.name_asc : return a.name.compareTo(b.name); break;
+        case SortType.name_desc : return b.name.compareTo(a.name); break;
+        case SortType.created_asc : return a.createdOn.compareTo(b.createdOn); break;
+        case SortType.created_desc : return b.createdOn.compareTo(a.createdOn); break;
+        case SortType.modified_asc : return a.modifiedOn.compareTo(b.modifiedOn); break;
+        case SortType.modified_desc : return b.modifiedOn.compareTo(a.modifiedOn); break;
+        case SortType.done_asc : return a.isDone==b.isDone ? 0 : (a.isDone ? -1 : 1); break;
+        case SortType.done_desc : return a.isDone==b.isDone ? 0 : (b.isDone ? -1 : 1); break;
+      }
+      return -1;
+    });
+    return givenList;
+  }
+
+  void _search(q){
+    setState((){searchText=q.trim().toLowerCase();});
+  }
+
+  void _clearSearch([q]){
+    setState((){searchText='';});
+  }
+
+  _TaskListPageState(){
+    searchBar = SearchBar(
+        inBar: true,
+        setState: setState,
+        onChanged: _search,
+        onSubmitted: _clearSearch,
+        onCleared: _clearSearch,
+        onClosed: _clearSearch,
+        buildDefaultAppBar: _buildAppBar
+    );
+  }
 
   @override
   void initState() {
@@ -34,19 +107,9 @@ class _TaskListPageState extends State<TaskListPage> {
 
   @override
   Widget build(BuildContext context) {
+    print('==build==');
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-        actions: <Widget>[
-          IconButton(
-            icon: Icon(Icons.refresh),
-            tooltip: 'Refresh',
-            onPressed: () {
-              refreshTasks();
-            },
-          ),
-        ],
-      ),
+      appBar: searchBar.build(context),
       body: getTaskListWidget(context),
       floatingActionButton: FloatingActionButton(
         onPressed: (){
@@ -57,6 +120,8 @@ class _TaskListPageState extends State<TaskListPage> {
         },
         tooltip: 'Add',
         child: Icon(Icons.add),
+        backgroundColor: Theme.of(context).accentColor,
+        foregroundColor: Colors.white,
       ), 
     );
   }
@@ -66,16 +131,33 @@ class _TaskListPageState extends State<TaskListPage> {
       child: FutureBuilder<TasksResponse>(
         future: this.tasks,
         builder: (context, snapshot) {
+          List<Task> tasksToShow;
           Widget getListItem(BuildContext context, int index) {
-            return TaskView(snapshot.data.tasks[index], ()=>{refreshTasks()});
+            Task t = tasksToShow[index];
+            if((searchText.length>0 && t.name.toLowerCase().contains(searchText)) || searchText.length==0){
+              return TaskView(t, ()=>{refreshTasks()});
+            }else{
+              return Container();
+            }
+          }
+          Widget getListItemSeparator(BuildContext context, int index) {
+            Task t = tasksToShow[index];
+            if((searchText.length>0 && t.name.toLowerCase().contains(searchText)) || searchText.length==0){
+              return Divider();
+            }else{
+              return Container();
+            }
           }
           if(snapshot.connectionState!=ConnectionState.none && snapshot.connectionState!=ConnectionState.waiting) {
             if (snapshot.hasData) {
               if(snapshot.data.success){
                 if(snapshot.data.tasks.length>0){
-                  return ListView.builder(
-                    itemCount: snapshot.data.tasks.length,
+                  tasksToShow = _sort(_sortType,snapshot.data.tasks);
+                  print('tasksToShow '+tasksToShow.toString());
+                  return ListView.separated(
+                    itemCount: tasksToShow.length,
                     itemBuilder: getListItem ,
+                    separatorBuilder: getListItemSeparator,
                   );
                 }else{
                   return Text("No Tasks");
@@ -87,104 +169,15 @@ class _TaskListPageState extends State<TaskListPage> {
               return Text('Error occured ${snapshot.error}');
             }
           }
-
-          // By default, show a loading spinner.
           return CircularProgressIndicator();
         },
-        ),
+      ),
     );
   }
 
 
 }
 
-class TaskView extends StatefulWidget{
-  Task task;
-  RefreshDataCall refreshDataCall;
-
-  TaskView(this.task, this.refreshDataCall);
-
-  @override
-  _TaskViewState createState() => _TaskViewState(task, refreshDataCall);
-}
-
-class _TaskViewState extends State<TaskView> {
-  DataService dataService = DataService();
-  Task task;
-  RefreshDataCall refreshDataCall;
-
-  _TaskViewState(this.task, this.refreshDataCall);
-
-  @override
-  Widget build(BuildContext context) {
-    TaskActionsImpl taskActions = TaskActionsImpl(task, refreshDataCall);
-
-    void updateTask(bool isDone){
-      bool olderIsDone = task.isDone;
-      task.isDone = isDone;
-      setState(() {task;});
-      dataService.updateTask(task).then((operationResponse) {
-        print('updateTask done '+operationResponse.toString());
-        if(!operationResponse.success){
-          task.isDone = olderIsDone;
-          setState(() {task;});
-          showMessage(context, 'Error occured');
-        }
-      });
-      print('updateTask');
-    }
-    
-    Widget getTaskActionsSheet(Task task, TaskActionsImpl taskActions){
-      return Container(
-        height: 180,
-        child: Column(
-          children: [
-            Container(
-              height: 45,
-              alignment: Alignment.centerLeft,
-              padding: EdgeInsets.all(10),
-              child: Text('${task.name}', textAlign: TextAlign.start, style: TextStyle(fontSize: 20),),
-            ),
-            Divider(thickness: 1,),
-            Expanded(child: ListView(
-              children: [
-                ListTile(
-                  leading: Icon(Icons.edit,),
-                  title: Text('Edit'),
-                  onTap: ()=>{taskActions.updateTask(context)},
-                ),
-                ListTile(
-                  leading: Icon(Icons.delete, color: Colors.red,),
-                  title: Text('Delete',style: TextStyle(color: Colors.red),),
-                  onTap: ()=>{taskActions.deleteTask(context)},
-                ),
-              ],))
-          ],
-        ),
-      );
-    }
-
-    void showTaskActionSheet(){
-      showModalBottomSheet<void>(
-        context: context,
-        builder: (context) => getTaskActionsSheet(task, taskActions),
-      );
-    }
-
-    return ListTile(
-      leading: Checkbox(value: task.isDone, onChanged: updateTask,),
-      title: Text(task.name,), 
-      trailing: IconButton(icon: Icon(Icons.more_vert), onPressed: showTaskActionSheet,),
-      onTap: (){
-        Navigator.of(context).push(PageRouteBuilder(
-        opaque: true,
-        pageBuilder: (BuildContext context, _, __) =>
-            TaskDetailPage(task)));
-      },
-    );
-  }
-
-}
 
 void showMessage(BuildContext context, String message){
   ScaffoldMessenger.of(context).showSnackBar(
@@ -209,17 +202,25 @@ class TaskActionsImpl implements TaskActions{
         pageBuilder: (BuildContext context, _, __) =>
             TaskCreatePage(_task,true,refreshDataCall)));
   }
-  void deleteTask(BuildContext context){
+  void deleteTask(BuildContext context, bool wait){
     print('deleteTask');
-    Navigator.of(context).pop();
+    if(!wait){
+      Navigator.of(context).pop();
+    }
     dataService.deleteTask(_task).then((operationResponse) {
       print('deleteTask done '+operationResponse.toString());
       if(operationResponse.success==true){
         showMessage(context, 'Task deleted');
+        if(wait){
+          Navigator.of(context).pop();
+        }
         refreshDataCall();
       }else{
         print('Task created error ');
         showMessage(context, 'Error occured');
+        if(wait){
+          Navigator.of(context).pop();
+        }
       }
     });
   }

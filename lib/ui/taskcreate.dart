@@ -23,6 +23,7 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
   Task task;
   bool isUpdate = false;
   RefreshDataCall refreshDataCall;
+  bool isProcessing = false;
 
   _TaskCreatePageState(this.task, this.isUpdate, this.refreshDataCall);
 
@@ -37,6 +38,7 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
   }
 
   void createTask(BuildContext context){
+    setState((){isProcessing = true;});
     dataService.createTask(task).then((operationResponse) {
       print('createTask done '+operationResponse.toString());
       print('createTask done '+operationResponse.success.toString());
@@ -49,10 +51,12 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
         print('Task created error ');
         showMessage(context, 'Error occured');
       }
+      setState((){isProcessing = false;});
     });
   }
 
   void updateTask(BuildContext context){
+    setState((){isProcessing = true;});
     dataService.updateTask(task).then((operationResponse) {
       print('createTask done '+operationResponse.toString());
       if(operationResponse.success){
@@ -62,6 +66,7 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
       }else{
         showMessage(context, 'Error occured');
       }
+      setState((){isProcessing = false;});
     });
   }
 
@@ -69,14 +74,24 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        leading: IconButton(
+          icon: Icon(Icons.close),
+          tooltip: 'Cancel',
+          onPressed: (){
+            Navigator.of(context).pop();
+          },
+        ),
         title: Text(isUpdate ? 'Update Task' : 'Create Task'),
         actions: <Widget>[
           IconButton(
             icon: Icon(Icons.save),
-            tooltip: 'Refresh',
+            tooltip: 'Save',
             onPressed: () {
-              isUpdate ? updateTask(context) : createTask(context);
+              if(!isProcessing){
+                isUpdate ? updateTask(context) : createTask(context);
+              }
             },
+            color: isProcessing ? Colors.black12 : Colors.white,
           ),
         ],
       ),
@@ -107,7 +122,13 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
           TableRow(
             children: <Widget>[
               Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Text('Is completed'),),
-              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Checkbox(value: task.isDone, onChanged: updateIsDone,),),
+              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Checkbox(value: task.isDone, onChanged: updateIsDone, activeColor: Theme.of(context).accentColor,),),
+            ],
+          ),
+          TableRow(
+            children: <Widget>[
+              Divider(thickness: 1,),
+              Divider(thickness: 1,),
             ],
           ),
         ],
