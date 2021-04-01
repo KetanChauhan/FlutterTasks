@@ -67,123 +67,126 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
   Widget getTaskDetailsView(BuildContext context) {
     DateFormat dateFormat = DateFormat("dd-MMM-yyyy HH:mm:ss a");
 
-    return Column(
-      children: [
-        Container(
-          padding: EdgeInsets.all(10),
-          child: Table(
-            columnWidths: const <int, TableColumnWidth>{
-              0: FractionColumnWidth(0.3),
-              1: FractionColumnWidth(0.7),
-            },
-            defaultVerticalAlignment: TableCellVerticalAlignment.top,
-            children: <TableRow>[
-              TableRow(
-                children: <Widget>[
-                  Padding(padding: EdgeInsets.all(10),
-                    child: Text('Task', style: TextStyle(fontSize: 25),),),
-                  Padding(padding: EdgeInsets.all(10),
-                    child: Text(task.name, style: TextStyle(fontSize: 25),),),
-                ],
-              ),
-              TableRow(
-                children: <Widget>[
-                  Divider(thickness: 1,),
-                  Divider(thickness: 1,),
-                ],
-              ),
-              TableRow(
-                children: <Widget>[
-                  Padding(padding: EdgeInsets.all(10), child: Text('Tags',),),
-                  Padding(padding: EdgeInsets.all(10), child: Wrap(
-                    spacing: 5,
-                    children: [
-                      task.isDone ? Chip(
-                        backgroundColor: Colors.green,
-                        visualDensity: VisualDensity.compact,
-                        label: Icon(Icons.done),
-                      ) : Container(),
-                    ],
-                  ),),
-                ],
-              ),
-              TableRow(
-                children: <Widget>[
-                  Padding(padding: EdgeInsets.all(10),
-                    child: Text(
-                      'Is completed', style: TextStyle(fontSize: 15),),),
-                  Padding(padding: EdgeInsets.all(10),
-                    child: task.isDone
-                        ? Text('Yes', style: TextStyle(
-                        fontSize: 15, color: Colors.greenAccent),)
-                        : Text('No', style: TextStyle(fontSize: 15),),
-                  ),
-                ],
-              ),
-              TableRow(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.all(10), child: Text('Created On',),),
-                  Padding(padding: EdgeInsets.all(10),
-                    child: Text(dateFormat.format(task.createdOn.toLocal()),),),
-                ],
-              ),
-              TableRow(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.all(10), child: Text('Modified On',),),
-                  Padding(padding: EdgeInsets.all(10),
-                    child: Text(
-                      dateFormat.format(task.modifiedOn.toLocal()),),),
-                ],
-              ),
-              TableRow(
-                children: <Widget>[
-                  Divider(thickness: 1,),
-                  Divider(thickness: 1,),
-                ],
-              ),
-              TableRow(
-                children: <Widget>[
-                  Padding(
-                    padding: EdgeInsets.all(10), child: Text('Actions',),),
-                  Column(
-                    children: [
-                      ListTile(
-                        leading: Icon(
-                          task.isDone ? Icons.check_box_outline_blank : Icons
-                              .check_box,),
-                        title: Text('Mark ${task.isDone
-                            ? 'Uncompleted'
-                            : 'Completed'}'),
-                        onTap: toggleTaskDone,
-                      ),
-                      ListTile(
-                        leading: Icon(Icons.edit,),
-                        title: Text('Edit'),
-                        onTap: () => {taskActions.updateTask(context)},
-                      ),
-                      ListTile(
-                        leading: Icon(Icons.delete, color: Colors.red,),
-                        title: Text(
-                          'Delete', style: TextStyle(color: Colors.red),),
-                        onTap: () => {taskActions.deleteTask(context, true)},
-                      ),
-                    ],
-                  )
-                ],
-              ),
-              TableRow(
-                children: <Widget>[
-                  Divider(thickness: 1,),
-                  Divider(thickness: 1,),
-                ],
-              ),
-            ],
+    return ListView(
+      children:[ Column(
+        children: [
+          Container(
+            padding: EdgeInsets.all(10),
+            child: Table(
+              columnWidths: const <int, TableColumnWidth>{
+                0: FractionColumnWidth(0.3),
+                1: FractionColumnWidth(0.7),
+              },
+              defaultVerticalAlignment: TableCellVerticalAlignment.top,
+              children: <TableRow>[
+                TableRow(
+                  children: <Widget>[
+                    Padding(padding: EdgeInsets.all(10),
+                      child: Text('Task', style: TextStyle(fontSize: 25),),),
+                    Padding(padding: EdgeInsets.all(10),
+                      child: Text(task.name, style: TextStyle(fontSize: 25),),),
+                  ],
+                ),
+                TableRow(
+                  children: <Widget>[
+                    Divider(thickness: 1,),
+                    Divider(thickness: 1,),
+                  ],
+                ),
+                TableRow(
+                  children: <Widget>[
+                    Padding(padding: EdgeInsets.all(10), child: Text('Tags',),),
+                    Padding(padding: EdgeInsets.all(10), child: Wrap(
+                      spacing: 5,
+                      children: [
+                        task.isDone ? Chip(
+                          backgroundColor: Colors.green,
+                          visualDensity: VisualDensity.compact,
+                          label: Icon(Icons.done),
+                        ) : Container(),
+                      ],
+                    ),),
+                  ],
+                ),
+                TableRow(
+                  children: <Widget>[
+                    Padding(padding: EdgeInsets.all(10),
+                      child: Text(
+                        'Is completed', style: TextStyle(fontSize: 15),),),
+                    Padding(padding: EdgeInsets.all(10),
+                      child: task.isDone
+                          ? Text('Yes', style: TextStyle(
+                          fontSize: 15, color: Colors.greenAccent),)
+                          : Text('No', style: TextStyle(fontSize: 15),),
+                    ),
+                  ],
+                ),
+                TableRow(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(10), child: Text('Created On',),),
+                    Padding(padding: EdgeInsets.all(10),
+                      child: Text(dateFormat.format(task.createdOn.toLocal()),),),
+                  ],
+                ),
+                TableRow(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(10), child: Text('Modified On',),),
+                    Padding(padding: EdgeInsets.all(10),
+                      child: Text(
+                        dateFormat.format(task.modifiedOn.toLocal()),),),
+                  ],
+                ),
+                TableRow(
+                  children: <Widget>[
+                    Divider(thickness: 1,),
+                    Divider(thickness: 1,),
+                  ],
+                ),
+                TableRow(
+                  children: <Widget>[
+                    Padding(
+                      padding: EdgeInsets.all(10), child: Text('Actions',),),
+                    Column(
+                      children: [
+                        ListTile(
+                          leading: Icon(
+                            task.isDone ? Icons.check_box_outline_blank : Icons
+                                .check_box,),
+                          title: Text('Mark ${task.isDone
+                              ? 'Uncompleted'
+                              : 'Completed'}'),
+                          onTap: toggleTaskDone,
+                        ),
+                        ListTile(
+                          leading: Icon(Icons.edit,),
+                          title: Text('Edit'),
+                          onTap: () => {taskActions.updateTask(context)},
+                        ),
+                        ListTile(
+                          leading: Icon(Icons.delete, color: Colors.red,),
+                          title: Text(
+                            'Delete', style: TextStyle(color: Colors.red),),
+                          onTap: () => {taskActions.deleteTask(context, true)},
+                        ),
+                      ],
+                    )
+                  ],
+                ),
+                TableRow(
+                  children: <Widget>[
+                    Divider(thickness: 1,),
+                    Divider(thickness: 1,),
+                  ],
+                ),
+              ],
+            ),
           ),
-        ),
 
-      ],
+        ],
+      ),
+      ]
     );
   }
 

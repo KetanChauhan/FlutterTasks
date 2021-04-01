@@ -15,6 +15,7 @@ class FlutterTasksApp extends StatelessWidget {
       darkTheme: ThemeData.dark().copyWith(primaryColor: Colors.blue, accentColor: Colors.pink),
       themeMode: ThemeMode.system,
       home: TaskListPage(title: 'Flutter Tasks'),
+      debugShowCheckedModeBanner: false,
     );
   }
 }

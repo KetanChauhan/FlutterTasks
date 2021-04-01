@@ -22,6 +22,7 @@ class _TaskListPageState extends State<TaskListPage> {
   String searchText = '';
   SearchBar searchBar;
   SortType _sortType = SortType.default_sort;
+  bool isAscending = true;
 
   AppBar _buildAppBar(BuildContext context) {
     return new AppBar(
@@ -29,11 +30,23 @@ class _TaskListPageState extends State<TaskListPage> {
         actions: [
           searchBar.getSearchAction(context),
           PopupMenuButton<SortType>(
-            onSelected: (SortType result) { _sortType = result; refreshTasks();},
+            icon: Icon(Icons.sort),
+            tooltip: 'Sort',
+            onSelected: (SortType result) {
+                if(result==SortType.asc){
+                  isAscending = true;
+                }else if(result==SortType.desc){
+                  isAscending = false;
+                }else{
+                  _sortType = result;
+                }
+                refreshTasks();
+              },
             itemBuilder: (BuildContext context) => SortType.values.toList().map((st)=>
                 PopupMenuItem<SortType>(
                   value: st,
                   child: Text(st.name),
+                  textStyle: (st==_sortType || (st==SortType.asc&&isAscending) || (st==SortType.desc&&!isAscending)) ? TextStyle(color: Theme.of(context).accentColor) : Theme.of(context).textTheme.subtitle2,
                 )
             ).toList(),
           ),
@@ -55,15 +68,13 @@ class _TaskListPageState extends State<TaskListPage> {
     }
     givenList.sort((a,b){
       switch(sortType){
-        case SortType.default_sort : return a.id.compareTo(b.id); break;
-        case SortType.name_asc : return a.name.compareTo(b.name); break;
-        case SortType.name_desc : return b.name.compareTo(a.name); break;
-        case SortType.created_asc : return a.createdOn.compareTo(b.createdOn); break;
-        case SortType.created_desc : return b.createdOn.compareTo(a.createdOn); break;
-        case SortType.modified_asc : return a.modifiedOn.compareTo(b.modifiedOn); break;
-        case SortType.modified_desc : return b.modifiedOn.compareTo(a.modifiedOn); break;
-        case SortType.done_asc : return a.isDone==b.isDone ? 0 : (a.isDone ? -1 : 1); break;
-        case SortType.done_desc : return a.isDone==b.isDone ? 0 : (b.isDone ? -1 : 1); break;
+        case SortType.default_sort :
+        case SortType.asc :
+          return a.id.compareTo(b.id); break;
+        case SortType.name : return isAscending ? a.name.compareTo(b.name) : b.name.compareTo(a.name); break;
+        case SortType.created : return isAscending ? a.createdOn.compareTo(b.createdOn) : b.createdOn.compareTo(a.createdOn); break;
+        case SortType.modified : return isAscending ? a.modifiedOn.compareTo(b.modifiedOn) : b.modifiedOn.compareTo(a.modifiedOn); break;
+        case SortType.done : return a.isDone==b.isDone ? 0 : (isAscending ? (a.isDone ? -1 : 1) : (b.isDone ? -1 : 1)); break;
       }
       return -1;
     });

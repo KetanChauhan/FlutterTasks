@@ -92,21 +92,20 @@ abstract class TaskActions{
 
 typedef RefreshDataCall = void Function();
 
-enum SortType { default_sort, name_asc, name_desc, created_asc, created_desc, modified_asc, modified_desc, done_asc, done_desc}
+//enum SortType { default_sort, name_asc, name_desc, created_asc, created_desc, modified_asc, modified_desc, done_asc, done_desc}
+enum SortType { default_sort, name, created, modified, done, asc, desc}
 
 extension SortTypeExtension on SortType {
 
   String get name {
     switch (this) {
       case SortType.default_sort : return "Default";
-      case SortType.name_asc : return "Name \u2191";
-      case SortType.name_desc : return "Name \u2193";
-      case SortType.created_asc : return "Created Date \u2191";
-      case SortType.created_desc : return "Created Date \u2193";
-      case SortType.modified_asc : return "Modified Date \u2191";
-      case SortType.modified_desc : return "Modified Date \u2193";
-      case SortType.done_asc : return "Completed \u2191";
-      case SortType.done_desc : return "Completed \u2193";
+      case SortType.name : return "Name";
+      case SortType.created : return "Created Date";
+      case SortType.modified : return "Modified Date";
+      case SortType.done : return "Completed";
+      case SortType.asc : return "\u2191 Ascending";
+      case SortType.desc : return "\u2193 Descending";
       default: return "";
     }
   }
