@@ -104,6 +104,10 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                           visualDensity: VisualDensity.compact,
                           label: Icon(Icons.done),
                         ) : Container(),
+                        for(Tag tag in task.tags) Chip(
+                          backgroundColor: HexColor(tag.color),
+                          visualDensity: VisualDensity.compact,
+                          label: Text(tag.name),),
                       ],
                     ),),
                   ],

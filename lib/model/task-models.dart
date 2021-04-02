@@ -5,16 +5,18 @@ class Task {
   final int id;
   String name;
   bool isDone;
+  List<Tag> tags = [];
   DateTime createdOn;
   DateTime modifiedOn;
 
-  Task({@required this.id, this.name, this.isDone, this.createdOn, this.modifiedOn});
+  Task({@required this.id, this.name, this.isDone, this.tags, this.createdOn, this.modifiedOn});
 
   factory Task.fromJson(Map<String, dynamic> json) {
     return Task(
       id: json['id'],
       name: json['name'],
       isDone: json['isDone'],
+      tags: json['tags'].map((tg) => Tag.fromJson(tg)).toList().cast<Tag>(),
       createdOn: DateTime.parse(json['createdOn']),
       modifiedOn: DateTime.parse(json['modifiedOn']),
     );
@@ -39,6 +41,47 @@ class Task {
   @override
   String toString() {
     return 'Task[ $id, $name, $isDone]';
+  }
+}
+
+class Tag {
+  final int id;
+  String name;
+  String color;
+  DateTime createdOn;
+  DateTime modifiedOn;
+
+  Tag({@required this.id, this.name, this.color, this.createdOn, this.modifiedOn});
+
+  factory Tag.fromJson(Map<String, dynamic> json) {
+    return Tag(
+      id: json['id'],
+      name: json['name'],
+      color: json['color'],
+      createdOn: DateTime.parse(json['createdOn']),
+      modifiedOn: DateTime.parse(json['modifiedOn']),
+    );
+  }
+  
+  factory Tag.getDefault(){
+    return Tag(
+      id: -1,
+      name: '',
+      color: '',
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'color': color,
+    };
+  }
+
+  @override
+  String toString() {
+    return 'Tag[ $id, $name, $color $createdOn $modifiedOn]';
   }
 }
 
@@ -109,4 +152,16 @@ extension SortTypeExtension on SortType {
       default: return "";
     }
   }
+}
+
+class HexColor extends Color {
+  static int _getColorFromHex(String hexColor) {
+    hexColor = hexColor.toUpperCase().replaceAll("#", "");
+    if (hexColor.length == 6) {
+      hexColor = "FF" + hexColor;
+    }
+    return int.parse(hexColor, radix: 16);
+  }
+
+  HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
 }

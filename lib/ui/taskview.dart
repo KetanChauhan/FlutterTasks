@@ -107,6 +107,10 @@ class _TaskViewState extends State<TaskView> {
                 //label: Text('Done', style: TextStyle(fontSize: 12,),),
                 label: Icon(Icons.done),
               ) : Container(),
+              for(Tag tag in task.tags) Chip(
+                backgroundColor: HexColor(tag.color),
+                visualDensity: VisualDensity.compact,
+                label: Text(tag.name),),
               /*Chip(
                 backgroundColor: Colors.red,
                 visualDensity: VisualDensity.compact,
