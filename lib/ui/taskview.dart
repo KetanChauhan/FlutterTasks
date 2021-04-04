@@ -97,35 +97,14 @@ class _TaskViewState extends State<TaskView> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(task.name,),
+          Container(height: 10,),
           Wrap(
             spacing: 5,
             children: [
-              task.isDone ?
-              Chip(
-                backgroundColor: Colors.green,
-                visualDensity: VisualDensity.compact,
-                //label: Text('Done', style: TextStyle(fontSize: 12,),),
-                label: Icon(Icons.done),
-              ) : Container(),
               for(Tag tag in task.tags) Chip(
                 backgroundColor: HexColor(tag.color),
                 visualDensity: VisualDensity.compact,
-                label: Text(tag.name),),
-              /*Chip(
-                backgroundColor: Colors.red,
-                visualDensity: VisualDensity.compact,
-                label: Text('Important', style: TextStyle(fontSize: 12,),),
-              ),
-              Chip(
-                backgroundColor: Colors.orangeAccent,
-                visualDensity: VisualDensity.compact,
-                label: Text('Normal', style: TextStyle(fontSize: 12,),),
-              ),
-              Chip(
-                backgroundColor: Colors.blue,
-                visualDensity: VisualDensity.compact,
-                label: Text('Relaxed', style: TextStyle(fontSize: 12,),),
-              ),*/
+                label: Text(tag.name, style: TextStyle(color: Colors.white)),),
             ],
           ),
         ],

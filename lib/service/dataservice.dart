@@ -74,4 +74,18 @@ class DataService{
     }
     return OperationResponse(success: false);
   }
+
+  Future<TagsResponse> fetchTags() async {
+    try{
+      final response = await http.get(Uri.https(mainUrl, 'tag'));
+
+      print('statusCode : ' + response.statusCode.toString());
+      if (response.statusCode == 200) {
+        return TagsResponse.fromJson(jsonDecode(response.body));
+      }
+    } on Exception catch(_){
+        return TagsResponse(success: false);
+    }
+    return TagsResponse(success: false);
+  }
 }

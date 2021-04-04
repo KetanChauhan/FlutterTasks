@@ -27,6 +27,7 @@ class Task {
       id: -1,
       name: '',
       isDone: false,
+      tags: []
     );
   }
 
@@ -35,12 +36,13 @@ class Task {
       'id': id,
       'name': name,
       'isDone': isDone,
+      'tags': tags
     };
   }
 
   @override
   String toString() {
-    return 'Task[ $id, $name, $isDone]';
+    return 'Task[ $id, $name, $isDone Tags[$tags]]';
   }
 }
 
@@ -81,7 +83,7 @@ class Tag {
 
   @override
   String toString() {
-    return 'Tag[ $id, $name, $color $createdOn $modifiedOn]';
+    return 'Tag[ $id, $name, $color]';
   }
 }
 
@@ -101,6 +103,25 @@ class TasksResponse {
   @override
   String toString() {
     return 'TasksResponse[ $success, $tasks]';
+  }
+}
+
+class TagsResponse {
+  final bool success;
+  List<Tag> tags;
+
+  TagsResponse({this.success, this.tags});
+
+  factory TagsResponse.fromJson(Map<String, dynamic> js) {
+    return TagsResponse(
+      success: js['success'],
+      tags: js['tags'].map((ts) => Tag.fromJson(ts)).toList().cast<Tag>(),
+    );
+  }
+
+  @override
+  String toString() {
+    return 'TagsResponse[ $success, $tags]';
   }
 }
 

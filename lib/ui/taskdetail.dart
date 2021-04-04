@@ -99,15 +99,10 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
                     Padding(padding: EdgeInsets.all(10), child: Wrap(
                       spacing: 5,
                       children: [
-                        task.isDone ? Chip(
-                          backgroundColor: Colors.green,
-                          visualDensity: VisualDensity.compact,
-                          label: Icon(Icons.done),
-                        ) : Container(),
                         for(Tag tag in task.tags) Chip(
                           backgroundColor: HexColor(tag.color),
                           visualDensity: VisualDensity.compact,
-                          label: Text(tag.name),),
+                          label: Text(tag.name, style: TextStyle(color: Colors.white),),),
                       ],
                     ),),
                   ],

@@ -71,6 +71,8 @@ class _TaskListPageState extends State<TaskListPage> {
         case SortType.default_sort :
         case SortType.asc :
           return a.id.compareTo(b.id); break;
+        case SortType.desc :
+          return b.id.compareTo(a.id); break;
         case SortType.name : return isAscending ? a.name.compareTo(b.name) : b.name.compareTo(a.name); break;
         case SortType.created : return isAscending ? a.createdOn.compareTo(b.createdOn) : b.createdOn.compareTo(a.createdOn); break;
         case SortType.modified : return isAscending ? a.modifiedOn.compareTo(b.modifiedOn) : b.modifiedOn.compareTo(a.modifiedOn); break;

@@ -21,11 +21,27 @@ class TaskCreatePage extends StatefulWidget {
 class _TaskCreatePageState extends State<TaskCreatePage> {
   DataService dataService = DataService();
   Task task;
+  Future<TagsResponse> tags;
   bool isUpdate = false;
   RefreshDataCall refreshDataCall;
   bool isProcessing = false;
 
   _TaskCreatePageState(this.task, this.isUpdate, this.refreshDataCall);
+
+
+  @override
+  void initState() {
+    super.initState();
+    //refreshTasks();
+    tags = dataService.fetchTags();
+  }
+
+  void refreshTasks(){
+      print('refreshTasks');
+    //tasks = dataService.fetchTasks();
+    setState((){tags = DataService().fetchTags();});
+    //setState((){});
+  }
 
   void updateName(String name){
     task.name = name;
@@ -34,6 +50,19 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
 
   void updateIsDone(bool isDone){
     task.isDone = isDone;
+    setState((){});
+  }
+
+  void updateTag(Tag tag, bool isSelected){
+    if(isSelected){
+      if(!task.tags.any((t) => t.id==tag.id)){
+        task.tags.add(tag);
+      }
+    }else{
+      if(task.tags.any((t) => t.id==tag.id)){
+        task.tags.removeWhere((t) => t.id==tag.id);
+      }
+    }
     setState((){});
   }
 
@@ -121,6 +150,12 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
           ),
           TableRow(
             children: <Widget>[
+              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Text('Tags'),),
+              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: getTagSelectView(),),
+            ],
+          ),
+          TableRow(
+            children: <Widget>[
               Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Text('Is completed'),),
               Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Checkbox(value: task.isDone, onChanged: updateIsDone, activeColor: Theme.of(context).accentColor,),),
             ],
@@ -133,6 +168,55 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
           ),
         ],
       ),
+    );
+  }
+
+  Widget getTagSelectView(){
+    return FutureBuilder<TagsResponse>(
+      future: this.tags,
+      builder: (context, snapshot) {
+        List<Tag> tagsToShow;
+        Widget getListItem(BuildContext context, Tag tag) {
+
+          updateTagSelection(bool isSelected){
+            updateTag(tag, isSelected);
+          }
+          return Container(
+            child: Container(
+              padding: EdgeInsets.all(5),
+              child: FilterChip(
+                  selectedColor: HexColor(tag.color),
+                  backgroundColor: HexColor('#33'+tag.color.split('#')[1]),
+                  visualDensity: VisualDensity.compact,
+                  label: Text(tag.name, style: TextStyle(color: Colors.white),), 
+                  selected: task.tags.any((t) => t.id==tag.id),
+                  onSelected: updateTagSelection,
+                ),
+            ),
+          );
+        }
+        if(snapshot.connectionState!=ConnectionState.none && snapshot.connectionState!=ConnectionState.waiting) {
+          if (snapshot.hasData) {
+            if(snapshot.data.success){
+              if(snapshot.data.tags.length>0){
+                tagsToShow = snapshot.data.tags;
+                return Wrap(
+                  children: [
+                    for(Tag tag in tagsToShow) getListItem(context, tag),
+                  ]
+                );
+              }else{
+                return Text("No Tags");
+              }
+            }else{
+              return Text("Error occured while getting tags");
+            }
+          } else if (snapshot.hasError) {
+            return Text('Error occured ${snapshot.error}');
+          }
+        }
+        return CircularProgressIndicator();
+      },
     );
   }
 }
