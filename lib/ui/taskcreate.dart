@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tasks/model/task-models.dart';
 import 'package:flutter_tasks/service/dataservice.dart';
+import 'package:flutter_tasks/ui/tagcreate.dart';
+import 'package:flutter_tasks/ui/taglist.dart';
 
 class TaskCreatePage extends StatefulWidget {
   DataService dataService = DataService();
@@ -36,7 +38,7 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
     tags = dataService.fetchTags();
   }
 
-  void refreshTasks(){
+  void refreshTags(){
       print('refreshTasks');
     //tasks = dataService.fetchTasks();
     setState((){tags = DataService().fetchTags();});
@@ -156,6 +158,24 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
           ),
           TableRow(
             children: <Widget>[
+              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Container(),),
+              Container(alignment: Alignment.centerRight, padding: EdgeInsets.all(10), child: 
+                InkWell(
+                  child: Text('Manage Tags', style: TextStyle(color: Colors.blue),),
+                  onTap: (){
+                    Navigator.of(context).push(PageRouteBuilder(
+                      opaque: true,
+                      pageBuilder: (BuildContext context, _, __) =>
+                          TagListPage(title: 'Tags', refreshDataCall: ()=>{refreshTags()})
+                      )
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+          TableRow(
+            children: <Widget>[
               Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Text('Is completed'),),
               Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Checkbox(value: task.isDone, onChanged: updateIsDone, activeColor: Theme.of(context).accentColor,),),
             ],
@@ -185,13 +205,14 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
             child: Container(
               padding: EdgeInsets.all(5),
               child: FilterChip(
-                  selectedColor: HexColor(tag.color),
-                  backgroundColor: HexColor('#33'+tag.color.split('#')[1]),
-                  visualDensity: VisualDensity.compact,
-                  label: Text(tag.name, style: TextStyle(color: Colors.white),), 
-                  selected: task.tags.any((t) => t.id==tag.id),
-                  onSelected: updateTagSelection,
-                ),
+                checkmarkColor: Colors.white,
+                selectedColor: HexColor(tag.color),
+                backgroundColor: HexColor(tag.color.length>7 ? '#33'+tag.color.split('#')[1].substring(2) : '#33'+tag.color.split('#')[1]),
+                visualDensity: VisualDensity.compact,
+                label: Text(tag.name, style: TextStyle(color: Colors.white),),
+                selected: task.tags.any((t) => t.id==tag.id),
+                onSelected: updateTagSelection,
+              ),
             ),
           );
         }

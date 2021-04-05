@@ -154,6 +154,11 @@ abstract class TaskActions{
   void deleteTask(BuildContext context, bool wait);
 }
 
+abstract class TagActions{
+  void updateTag(BuildContext context);
+  void deleteTag(BuildContext context, bool wait);
+}
+
 typedef RefreshDataCall = void Function();
 
 //enum SortType { default_sort, name_asc, name_desc, created_asc, created_desc, modified_asc, modified_desc, done_asc, done_desc}
@@ -184,5 +189,12 @@ class HexColor extends Color {
     return int.parse(hexColor, radix: 16);
   }
 
+  String toHex({bool leadingHashSign = true}) => '${leadingHashSign ? '#' : ''}'
+      '${alpha.toRadixString(16).padLeft(2, '0')}'
+      '${red.toRadixString(16).padLeft(2, '0')}'
+      '${green.toRadixString(16).padLeft(2, '0')}'
+      '${blue.toRadixString(16).padLeft(2, '0')}';
+
   HexColor(final String hexColor) : super(_getColorFromHex(hexColor));
+  HexColor.fromColor(final Color color) : super(color.value);
 }

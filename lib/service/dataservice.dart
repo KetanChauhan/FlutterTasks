@@ -88,4 +88,61 @@ class DataService{
     }
     return TagsResponse(success: false);
   }
+
+  
+  Future<OperationResponse> createTag(Tag tag) async {
+    try{
+      final response = await http.put(
+        Uri.https(mainUrl, 'tag'),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(tag)
+      );
+      
+      print('createTag statusCode : ' + response.statusCode.toString());
+      if (response.statusCode == 200) {
+        return OperationResponse.fromJson(jsonDecode(response.body));
+      }
+    } on Exception catch(_){
+        return OperationResponse(success: false);
+    }
+    return OperationResponse(success: false);
+  }
+
+  Future<OperationResponse> updateTag(Tag tag) async {
+    try{
+      final response = await http.post(
+        Uri.https(mainUrl, 'tag'),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(tag)
+      );
+      
+      print('updateTag statusCode : ' + response.statusCode.toString());
+      if (response.statusCode == 200) {
+        return OperationResponse.fromJson(jsonDecode(response.body));
+      }
+    } on Exception catch(_){
+        return OperationResponse(success: false);
+    }
+    return OperationResponse(success: false);
+  }
+
+  Future<OperationResponse> deleteTag(Tag tag) async {
+    try{
+      final response = await http.delete(
+        Uri.https(mainUrl, 'tag/'+tag.id.toString()));
+      
+      print('deleteTag statusCode : ' + response.statusCode.toString());
+      if (response.statusCode == 200) {
+        return OperationResponse.fromJson(jsonDecode(response.body));
+      }
+    } on Exception catch(_){
+        return OperationResponse(success: false);
+    }
+    return OperationResponse(success: false);
+  }
+
 }
