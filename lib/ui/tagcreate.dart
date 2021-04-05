@@ -113,24 +113,29 @@ class _TagCreatePageState extends State<TagCreatePage> {
           0: FractionColumnWidth(0.3),
           1: FractionColumnWidth(0.7),
         },
-        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
         children: <TableRow>[
           TableRow(
             children: <Widget>[
               Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Text('Tag Name'),),
-              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), 
+              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(0),
                 child: TextFormField(onChanged: updateName, initialValue: tag.name,)
               ),
             ],
           ),
           TableRow(
             children: <Widget>[
+              Divider(thickness: 1,),
+              Divider(thickness: 1,),
+            ],
+          ),
+          TableRow(
+            children: <Widget>[
               Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Text('Color'),),
-              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), 
+              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(0),
                 child: ColorPicker(
                   pickersEnabled: {ColorPickerType.primary:true,ColorPickerType.accent:false,},
-                  enableShadesSelection: false,
-
+                  enableShadesSelection: true,
+                  subheading: Divider(height: 1,),
                   color: HexColor(tag.color),
                   onColorChanged: (Color color) =>
                       updateColor(color),

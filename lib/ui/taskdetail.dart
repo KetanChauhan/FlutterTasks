@@ -33,15 +33,17 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
   void toggleTaskDone(){
     bool olderIsDone = task.isDone;
     task.isDone = !olderIsDone;
-    setState(() {task;});
+    setState(() {});
     dataService.updateTask(task).then((operationResponse) {
       print('updateTask done '+operationResponse.toString());
       if(!operationResponse.success){
         task.isDone = olderIsDone;
-        setState(() {task;});
+        setState(() {});
         showMessage(context, 'Error occured');
       }else{
+        task.modifiedOn = DateTime.now();
         refreshDataCall();
+        setState(() {});
       }
     });
     print('updateTask');
@@ -65,7 +67,7 @@ class _TaskDetailPageState extends State<TaskDetailPage> {
   }
 
   Widget getTaskDetailsView(BuildContext context) {
-    DateFormat dateFormat = DateFormat("dd-MMM-yyyy HH:mm:ss a");
+    DateFormat dateFormat = DateFormat("dd-MMM-yyyy hh:mm:ss a");
 
     return ListView(
       children:[ Column(

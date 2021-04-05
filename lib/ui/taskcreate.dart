@@ -152,6 +152,18 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
           ),
           TableRow(
             children: <Widget>[
+              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Text('Is completed'),),
+              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Checkbox(value: task.isDone, onChanged: updateIsDone, activeColor: Theme.of(context).accentColor,),),
+            ],
+          ),
+          TableRow(
+            children: <Widget>[
+              Divider(thickness: 1,),
+              Divider(thickness: 1,),
+            ],
+          ),
+          TableRow(
+            children: <Widget>[
               Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Text('Tags'),),
               Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: getTagSelectView(),),
             ],
@@ -159,25 +171,20 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
           TableRow(
             children: <Widget>[
               Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Container(),),
-              Container(alignment: Alignment.centerRight, padding: EdgeInsets.all(10), child: 
-                InkWell(
-                  child: Text('Manage Tags', style: TextStyle(color: Colors.blue),),
-                  onTap: (){
-                    Navigator.of(context).push(PageRouteBuilder(
+              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child:
+              InkWell(
+                child: Container(padding: EdgeInsets.all(10), child: Text('Manage Tags', style: TextStyle(color: Colors.blue),)),
+                onTap: (){
+                  Navigator.of(context).push(PageRouteBuilder(
+
                       opaque: true,
                       pageBuilder: (BuildContext context, _, __) =>
                           TagListPage(title: 'Tags', refreshDataCall: ()=>{refreshTags()})
-                      )
-                    );
-                  },
-                ),
+                  )
+                  );
+                },
               ),
-            ],
-          ),
-          TableRow(
-            children: <Widget>[
-              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Text('Is completed'),),
-              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Checkbox(value: task.isDone, onChanged: updateIsDone, activeColor: Theme.of(context).accentColor,),),
+              ),
             ],
           ),
           TableRow(

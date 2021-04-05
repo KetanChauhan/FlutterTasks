@@ -69,7 +69,7 @@ class Tag {
     return Tag(
       id: -1,
       name: '',
-      color: '',
+      color: '#FF2196F3',
     );
   }
 
@@ -106,6 +106,25 @@ class TasksResponse {
   }
 }
 
+class TaskResponse {
+  final bool success;
+  Task task;
+
+  TaskResponse({this.success, this.task});
+
+  factory TaskResponse.fromJson(Map<String, dynamic> js) {
+    return TaskResponse(
+      success: js['success'],
+      task: Task.fromJson(js['task']),
+    );
+  }
+
+  @override
+  String toString() {
+    return 'TasksResponse[ $success, $task]';
+  }
+}
+
 class TagsResponse {
   final bool success;
   List<Tag> tags;
@@ -122,6 +141,25 @@ class TagsResponse {
   @override
   String toString() {
     return 'TagsResponse[ $success, $tags]';
+  }
+}
+
+class TagResponse {
+  final bool success;
+  Tag tag;
+
+  TagResponse({this.success, this.tag});
+
+  factory TagResponse.fromJson(Map<String, dynamic> js) {
+    return TagResponse(
+      success: js['success'],
+      tag: Tag.fromJson(js['tags']),
+    );
+  }
+
+  @override
+  String toString() {
+    return 'TagsResponse[ $success, $tag]';
   }
 }
 
@@ -178,6 +216,7 @@ extension SortTypeExtension on SortType {
       default: return "";
     }
   }
+
 }
 
 class HexColor extends Color {

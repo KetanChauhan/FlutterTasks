@@ -20,6 +20,20 @@ class DataService{
     return TasksResponse(success: false);
   }
 
+  Future<TaskResponse> fetchTask(int id) async {
+    try{
+      final response = await http.get(Uri.https(mainUrl, 'task/'+id.toString()));
+
+      print('statusCode : ' + response.statusCode.toString());
+      if (response.statusCode == 200) {
+        return TaskResponse.fromJson(jsonDecode(response.body));
+      }
+    } on Exception catch(_){
+        return TaskResponse(success: false);
+    }
+    return TaskResponse(success: false);
+  }
+
   Future<OperationResponse> createTask(Task task) async {
     try{
       final response = await http.put(
@@ -89,7 +103,20 @@ class DataService{
     return TagsResponse(success: false);
   }
 
-  
+  Future<TagResponse> fetchTag(int id) async {
+    try{
+      final response = await http.get(Uri.https(mainUrl, 'tag/'+id.toString()));
+
+      print('statusCode : ' + response.statusCode.toString());
+      if (response.statusCode == 200) {
+        return TagResponse.fromJson(jsonDecode(response.body));
+      }
+    } on Exception catch(_){
+        return TagResponse(success: false);
+    }
+    return TagResponse(success: false);
+  }
+
   Future<OperationResponse> createTag(Tag tag) async {
     try{
       final response = await http.put(

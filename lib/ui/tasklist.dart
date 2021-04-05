@@ -5,6 +5,7 @@ import 'package:flutter_tasks/service/dataservice.dart';
 import 'package:flutter_tasks/ui/taskcreate.dart';
 import 'package:flutter_tasks/ui/taskdetail.dart';
 import 'package:flutter_tasks/ui/taskview.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class TaskListPage extends StatefulWidget {
   TaskListPage({Key key, this.title}) : super(key: key);
@@ -17,6 +18,7 @@ class TaskListPage extends StatefulWidget {
 
 class _TaskListPageState extends State<TaskListPage> {
   DataService dataService = DataService();
+
   Future<TasksResponse> tasks;
 
   String searchText = '';
@@ -40,6 +42,7 @@ class _TaskListPageState extends State<TaskListPage> {
                 }else{
                   _sortType = result;
                 }
+                saveSortPreference();
                 refreshTasks();
               },
             itemBuilder: (BuildContext context) => SortType.values.toList().map((st)=>
@@ -69,10 +72,9 @@ class _TaskListPageState extends State<TaskListPage> {
     givenList.sort((a,b){
       switch(sortType){
         case SortType.default_sort :
-        case SortType.asc :
-          return a.id.compareTo(b.id); break;
         case SortType.desc :
-          return b.id.compareTo(a.id); break;
+        case SortType.asc :
+          return isAscending ? a.id.compareTo(b.id) : b.id.compareTo(a.id);
         case SortType.name : return isAscending ? a.name.compareTo(b.name) : b.name.compareTo(a.name); break;
         case SortType.created : return isAscending ? a.createdOn.compareTo(b.createdOn) : b.createdOn.compareTo(a.createdOn); break;
         case SortType.modified : return isAscending ? a.modifiedOn.compareTo(b.modifiedOn) : b.modifiedOn.compareTo(a.modifiedOn); break;
@@ -108,7 +110,28 @@ class _TaskListPageState extends State<TaskListPage> {
       print('initState');
     super.initState();
     //refreshTasks();
+    initSavedPreferences();
     tasks = dataService.fetchTasks();
+  }
+
+  void initSavedPreferences() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String sortTypeString = prefs.getString('SortType');
+    print('Saved sortTypeString $sortTypeString');
+    SortType sortType =
+    (sortTypeString!=null && sortTypeString.length>0) ?
+      SortType.values.firstWhere((e) => e.toString() == sortTypeString, orElse: ()=> SortType.default_sort)
+      : SortType.default_sort;
+    _sortType = sortType;
+    bool isSortAscending = prefs.getBool('isSortAscending');
+    isAscending = isSortAscending!=null ? isSortAscending : true;
+    print('Saved sorttype $sortType $isSortAscending');
+  }
+
+  void saveSortPreference() async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.setString('SortType', _sortType.toString());
+    prefs.setBool('isSortAscending', isAscending);
   }
 
   void refreshTasks(){

@@ -1,4 +1,5 @@
 
+import 'package:flex_color_picker/flex_color_picker.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_tasks/model/task-models.dart';
@@ -27,9 +28,9 @@ class _TagViewState extends State<TagView> {
     TagActionsImpl tagActions = TagActionsImpl(tag, refreshDataCall);
 
     return ListTile(
-      leading: CircleAvatar(
-        backgroundColor: HexColor(tag.color),
-        child: Text(tag.name.substring(0,1), style: TextStyle(color: Colors.white)),),
+      leading: ColorIndicator(
+        color: HexColor(tag.color),
+      ),
       title: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -37,12 +38,13 @@ class _TagViewState extends State<TagView> {
         ],
       ),
       trailing: Container(
-        width: 80,
+        alignment: Alignment.centerRight,
+        width: 100,
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            IconButton(icon: Icon(Icons.edit), onPressed: ()=>{tagActions.updateTag(context)},),
-            IconButton(icon: Icon(Icons.delete), onPressed: ()=>{tagActions.deleteTag(context, false)},)
+            IconButton(icon: Icon(Icons.edit), tooltip: 'Edit', onPressed: ()=>{tagActions.updateTag(context)},),
+            IconButton(icon: Icon(Icons.delete), tooltip: 'Delete', onPressed: ()=>{tagActions.deleteTag(context, false)},)
           ],
         ),
       ),
