@@ -44,6 +44,9 @@ class _TagCreatePageState extends State<TagCreatePage> {
   }
 
   void createTag(BuildContext context){
+    if(!_isValidTag()){
+      return;
+    }
     setState((){isProcessing = true;});
     dataService.createTag(tag).then((operationResponse) {
       print('createTag done '+operationResponse.toString());
@@ -62,6 +65,9 @@ class _TagCreatePageState extends State<TagCreatePage> {
   }
 
   void updateTag(BuildContext context){
+    if(!_isValidTag()){
+      return;
+    }
     setState((){isProcessing = true;});
     dataService.updateTag(tag).then((operationResponse) {
       print('createTag done '+operationResponse.toString());
@@ -74,6 +80,14 @@ class _TagCreatePageState extends State<TagCreatePage> {
       }
       setState((){isProcessing = false;});
     });
+  }
+
+  bool _isValidTag(){
+    if(tag.name.trim().isEmpty){
+        showMessage(context, 'Please provide name.');
+        return false;
+    }
+    return true;
   }
 
   @override
@@ -106,51 +120,55 @@ class _TagCreatePageState extends State<TagCreatePage> {
   }
 
   Widget getTagCreateView(){
-    return Container(
-      padding: EdgeInsets.all(10),
-      child: Table(
-        columnWidths: const <int, TableColumnWidth>{
-          0: FractionColumnWidth(0.3),
-          1: FractionColumnWidth(0.7),
-        },
-        children: <TableRow>[
-          TableRow(
-            children: <Widget>[
-              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Text('Tag Name'),),
-              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(0),
-                child: TextFormField(onChanged: updateName, initialValue: tag.name,)
+    return ListView(
+      children: [
+        Container(
+          padding: EdgeInsets.all(10),
+          child: Table(
+            columnWidths: const <int, TableColumnWidth>{
+              0: FractionColumnWidth(0.3),
+              1: FractionColumnWidth(0.7),
+            },
+            children: <TableRow>[
+              TableRow(
+                children: <Widget>[
+                  Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Text('Tag Name'),),
+                  Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(0),
+                    child: TextFormField(onChanged: updateName, initialValue: tag.name,)
+                  ),
+                ],
+              ),
+              TableRow(
+                children: <Widget>[
+                  Divider(thickness: 1,),
+                  Divider(thickness: 1,),
+                ],
+              ),
+              TableRow(
+                children: <Widget>[
+                  Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Text('Color'),),
+                  Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(0),
+                    child: ColorPicker(
+                      pickersEnabled: {ColorPickerType.primary:true,ColorPickerType.accent:false,},
+                      enableShadesSelection: true,
+                      subheading: Divider(height: 1,),
+                      color: HexColor(tag.color),
+                      onColorChanged: (Color color) =>
+                          updateColor(color),
+                    ),
+                  ),
+                ],
+              ),
+              TableRow(
+                children: <Widget>[
+                  Divider(thickness: 1,),
+                  Divider(thickness: 1,),
+                ],
               ),
             ],
           ),
-          TableRow(
-            children: <Widget>[
-              Divider(thickness: 1,),
-              Divider(thickness: 1,),
-            ],
-          ),
-          TableRow(
-            children: <Widget>[
-              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Text('Color'),),
-              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(0),
-                child: ColorPicker(
-                  pickersEnabled: {ColorPickerType.primary:true,ColorPickerType.accent:false,},
-                  enableShadesSelection: true,
-                  subheading: Divider(height: 1,),
-                  color: HexColor(tag.color),
-                  onColorChanged: (Color color) =>
-                      updateColor(color),
-                ),
-              ),
-            ],
-          ),
-          TableRow(
-            children: <Widget>[
-              Divider(thickness: 1,),
-              Divider(thickness: 1,),
-            ],
-          ),
-        ],
-      ),
+        ),
+      ]
     );
   }
 }

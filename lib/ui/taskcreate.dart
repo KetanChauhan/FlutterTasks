@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_tasks/model/task-models.dart';
 import 'package:flutter_tasks/service/dataservice.dart';
-import 'package:flutter_tasks/ui/tagcreate.dart';
 import 'package:flutter_tasks/ui/taglist.dart';
 
 class TaskCreatePage extends StatefulWidget {
@@ -69,6 +68,9 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
   }
 
   void createTask(BuildContext context){
+    if(!_isValidTask()){
+      return;
+    }
     setState((){isProcessing = true;});
     dataService.createTask(task).then((operationResponse) {
       print('createTask done '+operationResponse.toString());
@@ -87,6 +89,9 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
   }
 
   void updateTask(BuildContext context){
+    if(!_isValidTask()){
+      return;
+    }
     setState((){isProcessing = true;});
     dataService.updateTask(task).then((operationResponse) {
       print('createTask done '+operationResponse.toString());
@@ -99,6 +104,14 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
       }
       setState((){isProcessing = false;});
     });
+  }
+
+  bool _isValidTask(){
+    if(task.name.trim().isEmpty){
+        showMessage(context, 'Please provide name.');
+        return false;
+    }
+    return true;
   }
 
   @override
@@ -133,68 +146,71 @@ class _TaskCreatePageState extends State<TaskCreatePage> {
   
 
   Widget getTaskCreateView(){
-    return Container(
-      padding: EdgeInsets.all(10),
-      child: Table(
-        columnWidths: const <int, TableColumnWidth>{
-          0: FractionColumnWidth(0.3),
-          1: FractionColumnWidth(0.7),
-        },
-        defaultVerticalAlignment: TableCellVerticalAlignment.middle,
-        children: <TableRow>[
-          TableRow(
-            children: <Widget>[
-              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Text('Task'),),
-              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), 
-                child: TextFormField(onChanged: updateName, initialValue: task.name,)
+    return ListView(
+      children: [
+        Container(
+          padding: EdgeInsets.all(10),
+          child: Table(
+            columnWidths: const <int, TableColumnWidth>{
+              0: FractionColumnWidth(0.3),
+              1: FractionColumnWidth(0.7),
+            },
+            children: <TableRow>[
+              TableRow(
+                children: <Widget>[
+                  Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Text('Task'),),
+                  Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(0), 
+                    child: TextFormField(onChanged: updateName, initialValue: task.name,)
+                  ),
+                ],
               ),
-            ],
-          ),
-          TableRow(
-            children: <Widget>[
-              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Text('Is completed'),),
-              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Checkbox(value: task.isDone, onChanged: updateIsDone, activeColor: Theme.of(context).accentColor,),),
-            ],
-          ),
-          TableRow(
-            children: <Widget>[
-              Divider(thickness: 1,),
-              Divider(thickness: 1,),
-            ],
-          ),
-          TableRow(
-            children: <Widget>[
-              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Text('Tags'),),
-              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: getTagSelectView(),),
-            ],
-          ),
-          TableRow(
-            children: <Widget>[
-              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Container(),),
-              Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child:
-              InkWell(
-                child: Container(padding: EdgeInsets.all(10), child: Text('Manage Tags', style: TextStyle(color: Colors.blue),)),
-                onTap: (){
-                  Navigator.of(context).push(PageRouteBuilder(
+              TableRow(
+                children: <Widget>[
+                  Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Text('Is completed'),),
+                  Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Checkbox(value: task.isDone, onChanged: updateIsDone, activeColor: Theme.of(context).accentColor,),),
+                ],
+              ),
+              TableRow(
+                children: <Widget>[
+                  Divider(thickness: 1,),
+                  Divider(thickness: 1,),
+                ],
+              ),
+              TableRow(
+                children: <Widget>[
+                  Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Text('Tags'),),
+                  Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(0), child: getTagSelectView(),),
+                ],
+              ),
+              TableRow(
+                children: <Widget>[
+                  Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child: Container(),),
+                  Container(alignment: Alignment.centerLeft, padding: EdgeInsets.all(10), child:
+                  InkWell(
+                    child: Container(padding: EdgeInsets.all(10), child: Text('Manage Tags', style: TextStyle(color: Colors.blue),)),
+                    onTap: (){
+                      Navigator.of(context).push(PageRouteBuilder(
 
-                      opaque: true,
-                      pageBuilder: (BuildContext context, _, __) =>
-                          TagListPage(title: 'Tags', refreshDataCall: ()=>{refreshTags()})
-                  )
-                  );
-                },
+                          opaque: true,
+                          pageBuilder: (BuildContext context, _, __) =>
+                              TagListPage(title: 'Tags', refreshDataCall: ()=>{refreshTags()})
+                      )
+                      );
+                    },
+                  ),
+                  ),
+                ],
               ),
+              TableRow(
+                children: <Widget>[
+                  Divider(thickness: 1,),
+                  Divider(thickness: 1,),
+                ],
               ),
             ],
           ),
-          TableRow(
-            children: <Widget>[
-              Divider(thickness: 1,),
-              Divider(thickness: 1,),
-            ],
-          ),
-        ],
-      ),
+        ),
+      ]
     );
   }
 
